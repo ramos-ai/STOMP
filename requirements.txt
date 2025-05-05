@@ -1,0 +1,8 @@
+numpy==2.0.2
+matplotlib==3.9.4
+tqdm==4.66.5
+ipywidgets==8.1.6
+plotly==6.0.1
+nbformat==5.10.4
+ruff==0.11.8
+

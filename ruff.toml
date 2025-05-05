@@ -1,0 +1,12 @@
+line-length = 88
+lint.select = ["E", "F", "I"]
+lint.ignore = []
+fix = true
+lint.unfixable = []
+
+[lint.per-file-ignores]
+
+[lint.isort]
+known-first-party = ["service"]
+combine-as-imports = true
+lines-after-imports = 2
