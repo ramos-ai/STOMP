@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 from gridworld.gridworld import GridWorld
 from stomp.steps.model_learning import ModelLearning
@@ -46,7 +47,7 @@ class STOMP(OptionLearning, ModelLearning, Planning):
     ):
         option_learning = []
         for hallway_idx in range(self.num_hallways):
-            print(
+            tqdm.write(
                 f"\nLearning options for hallway {hallway_idx} with {off_policy_steps} off-policy steps...\n"
             )
             initial_state_estimative = self.learn_options(
@@ -62,7 +63,7 @@ class STOMP(OptionLearning, ModelLearning, Planning):
     ):
         option_model_learning = []
         for option_idx in range(self.num_options):
-            print(
+            tqdm.write(
                 f"\nLearning models for Option {option_idx}, {'a Primitive Action' if option_idx < self.action_dim else 'a Full Option'}, with {off_policy_steps} off-policy steps...\n"
             )
             reward_model_errors, transition_model_errors = self.learn_models(
@@ -76,6 +77,9 @@ class STOMP(OptionLearning, ModelLearning, Planning):
     def execute_planning_with_options(
         self, lookahead_operations: int = 6_000, log_freq: int = 100
     ):
+        tqdm.write(
+            f"\nPlanning with the learned options with {lookahead_operations} operations steps...\n"
+        )
         initial_state_planning_estimative = self.plan_with_options(
             num_lookahead_operations=lookahead_operations, log_freq=log_freq
         )
@@ -115,6 +119,6 @@ class STOMP(OptionLearning, ModelLearning, Planning):
             "The planning value function is not updated. Check the learning process."
         )
 
-        print("\nLearning Finished!")
+        tqdm.write("\nLearning Finished!")
 
         return option_learning_logs, options_model_learning_logs, planning_logs
