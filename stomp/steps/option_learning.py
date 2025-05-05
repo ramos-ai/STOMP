@@ -1,8 +1,7 @@
 import numpy as np
 from tqdm import tqdm
-from tqdm.notebook import tqdm as tqdm_notebook
 
-from common.utils import is_notebook
+from common.utils import get_progress_bar
 from gridworld.gridworld import GridWorld
 from stomp.foundation import STOMPFoundation
 
@@ -36,9 +35,9 @@ class OptionLearning(STOMPFoundation):
         initial_state_estimative = []
 
         progress_bar = (
-            tqdm_notebook(range(off_policy_steps))
-            if is_notebook()
-            else tqdm(range(off_policy_steps))
+            range(off_policy_steps)
+            if log_freq is None
+            else get_progress_bar(off_policy_steps)
         )
 
         for step in progress_bar:

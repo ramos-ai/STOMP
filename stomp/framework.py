@@ -17,7 +17,7 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         alpha_p: np.float64 = 0.1,
         lambda_: np.float64 = 0,
         lambda_prime: np.float64 = 0,
-        alpha_step_size: np.float64 = 1,
+        alpha_step_size: np.float64 = 1.0,
     ):
         OptionLearning.__init__(
             self=self,
@@ -77,7 +77,7 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         self, lookahead_operations: int = 6_000, log_freq: int = 100
     ):
         initial_state_planning_estimative = self.plan_with_options(
-            num_lookahead_operations=lookahead_operations, log_freq=(log_freq // 10)
+            num_lookahead_operations=lookahead_operations, log_freq=log_freq
         )
         return initial_state_planning_estimative
 
@@ -91,19 +91,25 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         Learn the STOMP algorithm.
         """
 
-        option_learning_logs = self.execute_option_learning(off_policy_steps=off_policy_steps, log_freq=log_freq)
+        option_learning_logs = self.execute_option_learning(
+            off_policy_steps=off_policy_steps, log_freq=log_freq
+        )
 
         assert self.w_options[0].sum() != 0, (
-                "The option value function is not updated. Check the learning process."
-            )
-        
-        options_model_learning_logs = self.execute_models_option_learning(off_policy_steps=off_policy_steps, log_freq=log_freq)
+            "The option value function is not updated. Check the learning process."
+        )
+
+        options_model_learning_logs = self.execute_models_option_learning(
+            off_policy_steps=off_policy_steps, log_freq=log_freq
+        )
 
         assert self.w_rewards[0].sum() != 0, (
-                "The reward model is not updated. Check the learning process."
-            )
+            "The reward model is not updated. Check the learning process."
+        )
 
-        planning_logs = self.execute_planning_with_options(lookahead_operations=lookahead_operations)
+        planning_logs = self.execute_planning_with_options(
+            lookahead_operations=lookahead_operations, log_freq=log_freq
+        )
 
         assert self.w.sum() != 0, (
             "The planning value function is not updated. Check the learning process."
@@ -112,4 +118,3 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         print("\nLearning Finished!")
 
         return option_learning_logs, options_model_learning_logs, planning_logs
-
