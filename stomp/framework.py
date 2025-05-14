@@ -1,6 +1,9 @@
+import os
+
 import numpy as np
 from tqdm import tqdm
 
+from common.utils import save_learning_results
 from gridworld.gridworld import GridWorld
 from stomp.steps.model_learning import ModelLearning
 from stomp.steps.option_learning import OptionLearning
@@ -19,7 +22,9 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         lambda_: np.float64 = 0,
         lambda_prime: np.float64 = 0,
         alpha_step_size: np.float64 = 1.0,
+        experiment_name: str = "reward_respecting_options_and_primitive_actions",
     ):
+        self.experiment_name = experiment_name
         OptionLearning.__init__(
             self=self,
             env=env,
@@ -56,6 +61,12 @@ class STOMP(OptionLearning, ModelLearning, Planning):
                 log_freq=log_freq,
             )
             option_learning.append(initial_state_estimative)
+            save_learning_results(
+                initial_state_estimative,
+                os.path.join(self.experiment_name, "option_learning"),
+                f"initial_state_estimative_hallway_{hallway_idx}.pkl",
+            )
+            tqdm.write(f"Logs saved for hallway {hallway_idx}.\n")
         return option_learning
 
     def execute_models_option_learning(
@@ -72,6 +83,17 @@ class STOMP(OptionLearning, ModelLearning, Planning):
                 log_freq=log_freq,
             )
             option_model_learning.append((reward_model_errors, transition_model_errors))
+            save_learning_results(
+                reward_model_errors,
+                os.path.join(self.experiment_name, "model_learning"),
+                f"reward_model_errors_{option_idx}.pkl",
+            )
+            save_learning_results(
+                transition_model_errors,
+                os.path.join(self.experiment_name, "model_learning"),
+                f"transition_model_errors_{option_idx}.pkl",
+            )
+            tqdm.write(f"Logs saved for option {option_idx}.\n")
         return option_model_learning
 
     def execute_planning_with_options(
@@ -82,6 +104,11 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         )
         initial_state_planning_estimative = self.plan_with_options(
             num_lookahead_operations=lookahead_operations, log_freq=log_freq
+        )
+        save_learning_results(
+            initial_state_planning_estimative,
+            os.path.join(self.experiment_name, "planning_with_options"),
+            "initial_state_planning_estimative.pkl",
         )
         return initial_state_planning_estimative
 
@@ -103,6 +130,14 @@ class STOMP(OptionLearning, ModelLearning, Planning):
             "The option value function is not updated. Check the learning process."
         )
 
+        save_learning_results(
+            self.w_options,
+            os.path.join(self.experiment_name, "option_learning"),
+            "w_options.pkl",
+        )
+
+        tqdm.write("\nw_options saved!")
+
         options_model_learning_logs = self.execute_models_option_learning(
             off_policy_steps=off_policy_steps, log_freq=log_freq
         )
@@ -111,6 +146,20 @@ class STOMP(OptionLearning, ModelLearning, Planning):
             "The reward model is not updated. Check the learning process."
         )
 
+        save_learning_results(
+            self.w_rewards,
+            os.path.join(self.experiment_name, "model_learning"),
+            "w_rewards.pkl",
+        )
+
+        save_learning_results(
+            self.W_transitions,
+            os.path.join(self.experiment_name, "model_learning"),
+            "W_transitions.pkl",
+        )
+
+        tqdm.write("\w_rewards and W_transitions saved!")
+
         planning_logs = self.execute_planning_with_options(
             lookahead_operations=lookahead_operations, log_freq=log_freq
         )
@@ -118,6 +167,14 @@ class STOMP(OptionLearning, ModelLearning, Planning):
         assert self.w.sum() != 0, (
             "The planning value function is not updated. Check the learning process."
         )
+
+        save_learning_results(
+            self.w,
+            os.path.join(self.experiment_name, "planning_with_options"),
+            "w.pkl",
+        )
+
+        tqdm.write("\w saved!")
 
         tqdm.write("\nLearning Finished!")
 

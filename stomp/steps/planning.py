@@ -34,14 +34,6 @@ class Planning(STOMPFoundation):
         for operation in progress_bar:
             # Get a random state
             state = self.env.get_random_state()
-
-            # To reproduce Fig 1 we need to plan until reach the hallway,
-            # therefore, if the random state chosen is the hallway state,
-            # we try to get a different state.
-            # hallway_state = np.where(self.env.room_array == 8)
-            # while state == hallway_state:
-            #     state = self.env.get_random_state()
-
             state_features = self.env.state_to_features(state)
             max_backup_value = float("-inf")
 
