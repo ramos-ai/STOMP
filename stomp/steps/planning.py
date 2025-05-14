@@ -51,16 +51,14 @@ class Planning(STOMPFoundation):
 
             # Evaluating all options
             for option in available_options:
-                reward = self.linear_combination(state_features, self.w_rewards[option])
-                next_state_features = self.linear_combination(
-                    state_features, self.W_transitions[option]
-                )
-                next_state_value = self.linear_combination(next_state_features, self.w)
-                backup_value = reward + self.gamma * next_state_value
+                reward = self.w_rewards[option] @ state_features
+                next_state_features = self.W_transitions[option] @ state_features
+                next_state_value = self.w @ next_state_features
+                backup_value = reward + next_state_value
                 max_backup_value = max(max_backup_value, backup_value)
 
             # With the best option chosen, we now can update the environment weights
-            delta = max_backup_value - self.linear_combination(state_features, self.w)
+            delta = max_backup_value - self.w @ state_features
             self.w += self.alpha_step_size * delta * state_features
 
             if log_freq is not None and operation % log_freq == 0:

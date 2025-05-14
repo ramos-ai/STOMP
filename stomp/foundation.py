@@ -65,18 +65,12 @@ class STOMPFoundation:
         # self.w = np.random.uniform(-0.1, 0.1, self.state_dim)
         self.w = np.zeros(self.state_dim)
 
-    def linear_combination(self, state_features: NDArray, weights: NDArray) -> float:
-        """Calculate linear combination of features and weights"""
-        return np.dot(state_features, weights)
-
     def option_policy(self, state: State, hallway_idx: np.int64) -> NDArray:
         """Softmax policy for a specific hallway option"""
         state_action_values = np.zeros(self.action_dim)
         for a in range(self.action_dim):
             features = self.env.state_action_to_features(state, a)
-            state_action_values[a] = self.linear_combination(
-                features, self.theta_options[hallway_idx]
-            )
+            state_action_values[a] = features @ self.theta_options[hallway_idx]
 
         exp_values = np.exp(state_action_values)
         probs = exp_values / np.sum(exp_values)
@@ -91,7 +85,7 @@ class STOMPFoundation:
         hallway_feature = state_features[hallway_state_feature_idx]
         w_feature = self.w[hallway_state_feature_idx]
         return (
-            self.linear_combination(self.w, state_features)
+            self.w @ state_features
             - w_feature * hallway_feature
             + self.w_bonus * hallway_feature
         )
@@ -109,11 +103,9 @@ class STOMPFoundation:
             return True
         if stopping_value is None:
             stopping_value = self.get_stopping_value(state_features, hallway_idx)
-        option_value = self.linear_combination(
-            state_features, self.w_options[hallway_idx]
-        )
+        option_value = self.w_options[hallway_idx] @ state_features
         return stopping_value >= option_value
-    
+
     # This compute the general value function (GVF) for the option
     # Using Bellman's equation
     def compute_gvf(self, hallway_idx: int = 0, tol: float = 1e-6, max_iter: int = 500):
@@ -147,9 +139,10 @@ class STOMPFoundation:
                 for s_next, p_s in P[s].items():
                     # get c, β, z at s_next
                     feat = self.env.state_to_features(s_next)
-                    c_t1 = self.env.get_reward(s_next)        # or however you get c(s)
-                    beta_t1 = self.should_stop(feat, hallway_idx,
-                                            self.get_stopping_value(feat, hallway_idx))
+                    c_t1 = self.env.get_reward(s_next)  # or however you get c(s)
+                    beta_t1 = self.should_stop(
+                        feat, hallway_idx, self.get_stopping_value(feat, hallway_idx)
+                    )
                     z_t1 = self.get_stopping_value(feat, hallway_idx)
 
                     if beta_t1:

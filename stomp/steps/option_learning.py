@@ -42,9 +42,7 @@ class OptionLearning(STOMPFoundation):
 
         for step in progress_bar:
             initial_state_estimative.append(
-                self.linear_combination(
-                    initial_state_features, self.w_options[hallway_idx]
-                )
+                self.w_options[hallway_idx] @ initial_state_features
             )
 
             # Chose and execute an action from the equiprobable policy
@@ -66,10 +64,8 @@ class OptionLearning(STOMPFoundation):
             delta = self.td_error(
                 reward,
                 stopping_value,
-                self.linear_combination(state_features, self.w_options[hallway_idx]),
-                self.linear_combination(
-                    next_state_features, self.w_options[hallway_idx]
-                ),
+                self.w_options[hallway_idx] @ state_features,
+                self.w_options[hallway_idx] @ next_state_features,
                 int(stopping),
             )
 

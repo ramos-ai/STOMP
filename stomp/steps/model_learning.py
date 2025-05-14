@@ -52,15 +52,11 @@ class ModelLearning(STOMPFoundation):
             next_state_features = self.env.state_to_features(next_state)
 
             # Check the predicted values from the linear models
-            predicted_reward = self.linear_combination(
-                state_features, self.w_rewards[option_idx]
-            )
+            predicted_reward = self.w_rewards[option_idx] @ state_features
             reward_model_error = predicted_reward - reward
             reward_model_errors.append(reward_model_error)
 
-            predicted_transition = self.linear_combination(
-                state_features, self.W_transitions[option_idx]
-            )
+            predicted_transition = self.W_transitions[option_idx] @ state_features
             transition_model_error = np.linalg.norm(
                 predicted_transition - next_state_features
             )
@@ -93,10 +89,8 @@ class ModelLearning(STOMPFoundation):
             delta_r = self.td_error(
                 reward,
                 0,
-                self.linear_combination(state_features, self.w_rewards[option_idx]),
-                self.linear_combination(
-                    next_state_features, self.w_rewards[option_idx]
-                ),
+                self.w_rewards[option_idx] @ state_features,
+                self.w_rewards[option_idx] @ next_state_features,
                 int(stopping),
             )
 
@@ -114,12 +108,8 @@ class ModelLearning(STOMPFoundation):
                 delta_n = self.td_error(
                     0,
                     next_state_features[j],
-                    self.linear_combination(
-                        state_features, self.W_transitions[option_idx][j]
-                    ),
-                    self.linear_combination(
-                        next_state_features, self.W_transitions[option_idx][j]
-                    ),
+                    self.W_transitions[option_idx][j] @ state_features,
+                    self.W_transitions[option_idx][j] @ next_state_features,
                     int(stopping),
                 )
 
@@ -134,7 +124,7 @@ class ModelLearning(STOMPFoundation):
                     rho,
                     self.gamma * self.lambda_ * (1 - int(stopping)),
                 )
-            
+
             # Go to next state
             state = next_state
             state_features = next_state_features
