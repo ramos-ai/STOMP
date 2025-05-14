@@ -82,6 +82,7 @@ class STOMPFoundation:
         probs = exp_values / np.sum(exp_values)
         return probs
 
+    # In the original paper, this is the z function
     def get_stopping_value(
         self, state_features: NDArray, hallway_idx: np.int64
     ) -> np.float64:
@@ -95,6 +96,7 @@ class STOMPFoundation:
             + self.w_bonus * hallway_feature
         )
 
+    # In the original paper, this is the beta function from the option
     def should_stop(
         self,
         state_features: NDArray,
@@ -111,6 +113,59 @@ class STOMPFoundation:
             state_features, self.w_options[hallway_idx]
         )
         return stopping_value >= option_value
+    
+    # This compute the general value function (GVF) for the option
+    # Using Bellman's equation
+    def compute_gvf(self, hallway_idx: int = 0, tol: float = 1e-6, max_iter: int = 500):
+        # 1. Build static transition model for this option/policy
+        all_states = self.env.get_all_states()
+        P = {s: {} for s in all_states}  # P[s][s'] = P^π(s'|s)
+
+        for s in all_states:
+            pi_probs = self.option_policy(s, hallway_idx)
+            P[s] = {}
+            for a, pa in enumerate(pi_probs):
+                # query, but do not change env.current_state
+                old_state = self.env.current_state
+                self.env.current_state = s
+                s_next, reward, done = self.env.step(a)
+                self.env.current_state = old_state
+
+                P[s].setdefault(s_next, 0.0)
+                P[s][s_next] += pa  # accumulate probability mass
+
+        # 2. Initialize v-table
+        v = {s: 0.0 for s in all_states}
+
+        # 3. Gauss–Seidel style sweeps
+        for _ in range(max_iter):
+            delta = 0.0
+            for s in all_states:
+                v_old = v[s]
+                total = 0.0
+
+                for s_next, p_s in P[s].items():
+                    # get c, β, z at s_next
+                    feat = self.env.state_to_features(s_next)
+                    c_t1 = self.env.get_reward(s_next)        # or however you get c(s)
+                    beta_t1 = self.should_stop(feat, hallway_idx,
+                                            self.get_stopping_value(feat, hallway_idx))
+                    z_t1 = self.get_stopping_value(feat, hallway_idx)
+
+                    if beta_t1:
+                        # terminal: just reward + γ·z
+                        total += p_s * (c_t1 + self.gamma * z_t1)
+                    else:
+                        cont = (1 - beta_t1) * v[s_next] + beta_t1 * z_t1
+                        total += p_s * (c_t1 + self.gamma * cont)
+
+                v[s] = total
+                delta = max(delta, abs(v[s] - v_old))
+
+            if delta < tol:
+                break
+
+        return v
 
     def td_error(
         self,

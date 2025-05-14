@@ -8,7 +8,10 @@ from stomp.foundation import STOMPFoundation
 
 class Planning(STOMPFoundation):
     def __init__(
-        self, env: GridWorld, gamma: np.float64 = 0.99, alpha_step_size: np.float64 = 1.0
+        self,
+        env: GridWorld,
+        gamma: np.float64 = 0.99,
+        alpha_step_size: np.float64 = 1.0,
     ):
         super().__init__(env, gamma)
         self.alpha_step_size = alpha_step_size
@@ -42,6 +45,10 @@ class Planning(STOMPFoundation):
             state_features = self.env.state_to_features(state)
             max_backup_value = float("-inf")
 
+            v = self.compute_gvf()
+            v_0 = (self.env.initial_state[0][0], self.env.initial_state[1][0])
+            initial_state_planning_estimative.append(v[v_0])
+
             # Evaluating all options
             for option in available_options:
                 reward = self.linear_combination(state_features, self.w_rewards[option])
@@ -49,18 +56,12 @@ class Planning(STOMPFoundation):
                     state_features, self.W_transitions[option]
                 )
                 next_state_value = self.linear_combination(next_state_features, self.w)
-                backup_value = reward + next_state_value
+                backup_value = reward + self.gamma * next_state_value
                 max_backup_value = max(max_backup_value, backup_value)
 
             # With the best option chosen, we now can update the environment weights
             delta = max_backup_value - self.linear_combination(state_features, self.w)
             self.w += self.alpha_step_size * delta * state_features
-
-            initial_state_planning_estimative.append(
-                self.linear_combination(
-                    self.env.state_to_features(self.env.initial_state), self.w
-                )
-            )
 
             if log_freq is not None and operation % log_freq == 0:
                 tqdm.write(

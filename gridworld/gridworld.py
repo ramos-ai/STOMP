@@ -61,14 +61,18 @@ class GridWorld:
             ValueError: If the room_array doesn't contain a start state (10) or goal state (1)
         """
         self.room_array: NDArray = np.array(room_array)
-        self.action_space: NDArray[np.int64] = np.array([0, 1, 2, 3])  # 0:Up, 1:Down, 2:Left, 3:Right
+        self.action_space: NDArray[np.int64] = np.array(
+            [0, 1, 2, 3]
+        )  # 0:Up, 1:Down, 2:Left, 3:Right
         self.num_actions: int = len(self.action_space)
         self.num_states: int = len(np.where(self.room_array != 9)[0])
         self.initial_state: State = np.where(self.room_array == 10)
         self.current_state: State = self.initial_state
         self.visited_states: List[State] = [self.initial_state]
         self.hallways_info: HallwaysInfo = self.__get_hallways_info()
-        self.hallways_indices: List[np.int64] = [hallway[-1] for hallway in self.hallways_info]
+        self.hallways_indices: List[np.int64] = [
+            hallway[-1] for hallway in self.hallways_info
+        ]
 
     def __get_hallways_info(self) -> HallwaysInfo:
         hallways_x, hallways_y = np.where(self.room_array == 8)
@@ -82,6 +86,10 @@ class GridWorld:
                 (hallway_state, hallway_state_feature, np.argmax(hallway_state_feature))
             )
         return hallways_info
+
+    def is_hallway_state(self, state: State) -> bool:
+        row, col = state[0], state[1]
+        return self.room_array[row, col] == 8
 
     def get_all_states(self) -> list[tuple[int, int]]:
         """Get all valid states (non-wall states) in the grid world.
@@ -145,6 +153,34 @@ class GridWorld:
                 "The given coordinates do not correspond to a valid state."
             )
 
+    def features_to_state(self, features: NDArray) -> State:
+        """Convert a one-hot encoded feature vector back to state coordinates.
+
+        Args:
+            features (numpy.ndarray): One-hot encoded feature vector of length num_states
+
+        Returns:
+            tuple: State coordinates as (np.array([x]), np.array([y]))
+
+        Raises:
+            ValueError: If the feature vector is invalid or doesn't correspond to a state
+        """
+        if not any(features) or len(features) != self.num_states - 1:
+            raise ValueError("Invalid feature vector")
+
+        # Get the index of the 1 in the one-hot vector
+        state_idx = np.argmax(features)
+
+        # Get all valid states in the same order as used in state_to_features
+        flat_array = self.get_all_states()
+
+        if state_idx >= len(flat_array):
+            raise ValueError("Feature vector index exceeds number of valid states")
+
+        # Get the corresponding coordinates
+        x, y = flat_array[state_idx]
+        return (np.array([x]), np.array([y]))
+
     def state_action_to_features(self, state: State, action: np.int64) -> NDArray:
         """Convert a state-action pair to a one-hot encoded feature vector.
 
@@ -191,15 +227,21 @@ class GridWorld:
                 -1: Obstacle
                 0: Free space
         """
-        state_reward_value: np.int64 = self.room_array[next_state][0]
-        if (
-            state_reward_value == 10
-            or state_reward_value == 9
-            or state_reward_value == 8
-        ):
-            return np.int64(0)
-        else:
-            return state_reward_value
+        try:
+            state_reward_value: np.int64 = self.room_array[next_state]
+            if (
+                state_reward_value == 10
+                or state_reward_value == 9
+                or state_reward_value == 8
+            ):
+                return np.int64(0)
+            else:
+                return state_reward_value
+        except IndexError:
+            print("Invalid state:", next_state)
+            raise IndexError(
+                "The given coordinates do not correspond to a valid state."
+            )
 
     def is_terminal(self, state: State) -> bool:
         """Check if the given state is a terminal state (goal).
