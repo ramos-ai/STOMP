@@ -31,11 +31,9 @@ def save_learning_results(
         experiment_name: Name of the experiment/method (e.g., 'option_learning')
         base_path: Base directory for saving results
     """
-    # Create timestamp for unique identification
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Create the full path including experiment name
-    full_path = os.path.join(base_path, experiment_name, timestamp)
+    full_path = os.path.join(base_path, experiment_name)
 
     # Create directories if they don't exist
     os.makedirs(full_path, exist_ok=True)

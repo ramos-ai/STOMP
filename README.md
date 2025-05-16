@@ -6,11 +6,11 @@ This is an implementation of the STOMP framework, described by (SUTTON et al., 2
 
 An important disclaimer is that this this implementation only tried to reproduce the results for the two-rooms environment and didn't reach the exact results described on the paper.
 
-It is important to notice that this is still a work in progress but contributions are welcome.
+It is important to notice that this is still a work in progress and contributions are welcome.
 
 ## Results
 
-The full results can be seen in the main.ipynb notebook, but here are a summary of the achieved results
+The full results can be seen in the main.ipynb notebook and for run the code using a multithread approach, please refer to main.py. Here are a summary of the achieved results
 
 ### STOPM Step 2: Option Learning
 
@@ -33,12 +33,9 @@ We did implemented the model learning but we didn't plot the RMS error of such m
 
 ### STOPM Step 4: Option Learning
 
-For the planning with options case we have a more severe difference. In our experiments we were not able to make converge the curve to the value optimal value. Also, in several experiments the estimative explode and reached values in the magnitude of 10e6.
+For the planning with options case our plot is not starting at zero, but it is reaching the optimal value and have the same shape of the one presented by the authors. It is not 100 percent clear of what is been plotted on the paper and although the standard deviation of our plot seems huge, it is only a difference of ~0.015.
 
-Important considerations about our planning code:
-
-1. In the paper it is mentioned that the vector **w** of the environment is randomly initialized and also is said that is zero initialized. In our implementation we consider the zero initialization
-2. The paper mentioned that 5 models were learned, one for the real option and other 4 for the primitive action, but the paper didn't explicitly tells how the primitive actions models are learned and we considered 5 linear models.
+Therefore, we consider our implementation of the paper is correct.
 
 | Our Implementation | Original Paper Results |
 |:-----------------:|:---------------------:|

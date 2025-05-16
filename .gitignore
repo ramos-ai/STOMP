@@ -3,3 +3,4 @@ share
 .ruff_cache
 .DS_store
 __pycache__
+results
