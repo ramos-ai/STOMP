@@ -18,7 +18,7 @@ def run_experiment(run_idx):
     env = GridWorld(room_design)
     stomp = STOMP(
         env,
-        experiment_name=f"reward_respecting_options_and_primitive_actions_{run_idx}",
+        experiment_name=f"reward_respecting_options_linear_combination_{run_idx}",
     )
 
     env.reset()
@@ -73,7 +73,7 @@ def plot_arrays(mean_array, std_array, plotting_info, plotting_name):
     # Plot mean line with shaded standard deviation
     plt.plot(x, mean_array, "b-", label="Mean")
     plt.fill_between(
-        x,
+        x, 
         mean_array - std_array,
         mean_array + std_array,
         color="b",

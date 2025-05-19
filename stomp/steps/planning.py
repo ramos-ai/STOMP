@@ -37,9 +37,10 @@ class Planning(STOMPFoundation):
             state_features = self.env.state_to_features(state)
             max_backup_value = float("-inf")
 
-            v = self.compute_gvf()
-            v_0 = (self.env.initial_state[0][0], self.env.initial_state[1][0])
-            initial_state_planning_estimative.append(v[v_0])
+            # v = self.compute_gvf()
+            # v_0 = (self.env.initial_state[0][0], self.env.initial_state[1][0])
+            # initial_state_planning_estimative.append(v[v_0])
+            initial_state_planning_estimative.append(self.w @ state_features)
 
             # Evaluating all options
             for option in available_options:
