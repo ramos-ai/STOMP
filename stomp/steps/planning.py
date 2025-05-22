@@ -40,7 +40,8 @@ class Planning(STOMPFoundation):
             # v = self.compute_gvf()
             # v_0 = (self.env.initial_state[0][0], self.env.initial_state[1][0])
             # initial_state_planning_estimative.append(v[v_0])
-            initial_state_planning_estimative.append(self.w @ state_features)
+            initial_state_features = self.env.state_to_features(self.env.initial_state)
+            initial_state_planning_estimative.append(self.w @ initial_state_features)
 
             # Evaluating all options
             for option in available_options:
