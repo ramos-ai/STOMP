@@ -132,19 +132,12 @@ class GridWorld:
         # Flatten the room_design array and filter out the 9's
         flat_array = self.get_all_states()
 
-        # Initialize the state_feature array
-        state_feature = []
-
-        # Create a zero array with 1 in the corresponding position for each valid cell
-        for idx, (i, j) in enumerate(flat_array):
-            feature = [0] * len(flat_array)
-            feature[idx] = 1
-            state_feature.append(feature)
-
         # Find the index of the given coordinates in the flat_array
         if state in flat_array:
+            state_features = np.zeros(len(flat_array))
             index = flat_array.index(state)
-            return np.array(state_feature[index])
+            state_features[index] = 1.0
+            return np.array(state_features)  # (state_feature[index])
         elif self.is_terminal(state):
             return np.zeros(self.num_states - 1)
         else:
