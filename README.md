@@ -1,4 +1,10 @@
-# Subtask, Option, Model, Planing - STOMP
+# SubTask, Option, Model, Planning - STOMP
+
+## Installation
+
+```bash
+$ pip install -e .
+```
 
 ## Introduction
 
@@ -12,7 +18,7 @@ It is important to notice that this is still a work in progress and contribution
 
 The full results can be seen in the main.ipynb notebook and for run the code using a multithread approach, please refer to main.py. Here are a summary of the achieved results
 
-### STOPM Step 2: Option Learning
+### STOMP Step 2: Option Learning
 
 For the Option Learning plots we achieved a close results as compared to the one on the paper, and the intra-policy that we learn, it is very similar to the one on the paper too.
 
@@ -27,11 +33,11 @@ Nevertheless those differences, we believe that our implementation of Option Lea
 |:-----------------:|:---------------------:|
 | ![Option Learning Results](static/option_learning.png) | ![Sutton's Results](static/option_learning_sutton.png) |
 
-### STOPM Step 3: Model Learning
+### STOMP Step 3: Model Learning
 
 We did implemented the model learning but we didn't plot the RMS error of such models for lack of clarity on how those errors were calculated.
 
-### STOPM Step 4: Option Learning
+### STOMP Step 4: Planning
 
 For the planning with options case our plot is not starting at zero, but it is reaching the optimal value and have the same shape of the one presented by the authors. It is not 100 percent clear of what is been plotted on the paper and although the standard deviation of our plot seems huge, it is only a difference of ~0.015.
 

@@ -4,3 +4,4 @@ share
 .DS_store
 __pycache__
 results
+*.egg-info
