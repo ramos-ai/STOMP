@@ -73,7 +73,7 @@ def plot_arrays(mean_array, std_array, plotting_info, plotting_name):
     # Plot mean line with shaded standard deviation
     plt.plot(x, mean_array, "b-", label="Mean")
     plt.fill_between(
-        x, 
+        x,
         mean_array - std_array,
         mean_array + std_array,
         color="b",
