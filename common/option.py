@@ -11,7 +11,7 @@ def get_true_option_reward_model(
         foundation: Foundation,
         subgoal_idx: int,
         gamma: float =0.99):
-    """Get the true reward model for the environment and option"""
+    """ Get the true reward model for the option in the environment for a given task. Eq (12) in the paper. """
 
     TRUE_REWARD_MODEL = {s: 0. for s in range(env.num_states)}
     for s in range(env.num_states):
@@ -57,7 +57,7 @@ def get_true_option_transition_model(
         foundation: Foundation,
         subgoal_idx: int,
         gamma: float =0.99):
-    """Get the true transition model for the environment and option"""
+    """ Get the true transition model for the option in the environment for a given task. Eq (13) in the paper."""
 
     TRUE_TRANSITION_MODEL = {s: [0. for _ in range(env.num_states)] for s in range(env.num_states)}
     for s in range(env.num_states):

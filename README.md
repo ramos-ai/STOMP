@@ -16,30 +16,43 @@ It is important to notice that this is still a work in progress and contribution
 
 ## Results
 
-The full results can be seen in the main.ipynb notebook and for run the code using a multithread approach, please refer to main.py. Here are a summary of the achieved results
+The full results can be seen in the `main.ipynb` notebook and `./experiments_from_stomp` folder, and to run the code using a multithread approach, please refer to `main.py`. Here are a summary of the achieved results:
+
 
 ### STOMP Step 2: Option Learning
 
-For the Option Learning plots we achieved a close results as compared to the one on the paper, and the intra-policy that we learn, it is very similar to the one on the paper too.
+In the Option Learning step, we are learning the value function and the policy of an option policy that reaches the hallway in TwoRooms domain. Our plots achieved a close result as compared to the one in the paper, and the intra-policy we learned is very similar to the one in the paper too.
 
-However, here are two main difference that we can spot in the two images are:
+However, we spotted two main differences between our results and the originals from the paper:
 
-1. In the sutton paper, the start state estimative seems to reach a minimum value of -1.3, while in our implementation our minimum value is -0.2;
-2. In the sutton paper, the start state estimative decline more aggressively and the have a "v" shape, while our curve have a less aggressive decline and have something more like a "s" shape.
+1. Our value estimatives of the initial state (blue line, right axis) reach a minimum of ~-0.2, while the estimatives in the paper reach a bottom of ~-1.3; Also, we notice the value estimatives in the paper decline more aggressively and form a _V_ shape, in contrast to our results that decline more smoothly and form a _S_ shape.
+2. The RMSE was computed over all optimal state value and the predictions of our learned parameters (red line, left axis). In our implementation, the curve tops at around ~1.1 whereas the original implementation the error reaches over ~1.6.
 
-Nevertheless those differences, we believe that our implementation of Option Learning is correct and reflects the paper description, while the differences pointed here can be attribute to  image scale errors.
+Nevertheless those differences, we believe that our implementation of Option Learning is correct and reflects the paper description. We notice that after 50000 steps both curves ends in a similar value.
 
 | Our Implementation | Original Paper Results |
 |:-----------------:|:---------------------:|
-| ![Option Learning Results](static/option_learning.png) | ![Sutton's Results](static/option_learning_sutton.png) |
+| ![Option Learning Results](static/chapter_3_option_learning_fig_2_ours.png) | ![Sutton's Results](static/option_learning_sutton.png) |
+
 
 ### STOMP Step 3: Model Learning
 
-We did implemented the model learning but we didn't plot the RMS error of such models for lack of clarity on how those errors were calculated.
+For Model Learning, we learn the model of the hallway option and we are evaluating the shape and numerical results of the blue and red line. The blue line (right axis) is the error in the transition model. The red line (left axis) is the error in the reward model.
+
+We achieved very similar results but we noted this slight difference:
+
+1. The RMSE of the reward model (red line) was computed over all states. The results we obtained form a similar curve shape to the original, but our initial error starts at around ~0.5 and reaches a minimum of around ~0.2. The same curve in the original work starts at ~0.3 and ends below ~0.1.
+
+We assume the learned model is correct due to the shape of the curve and the difference in values might be a detail in implementation or scale of the graph.
+
+| Our Implementation | Original Paper Results |
+|:-----------------:|:---------------------:|
+| ![Model Learning Results](static/chapter_4_model_learning_fig_3_ours.png) | ![Sutton's Results](static/model_learning_sutton.png) |
+
 
 ### STOMP Step 4: Planning
 
-For the planning with options case our plot is not starting at zero, but it is reaching the optimal value and have the same shape of the one presented by the authors. It is not 100 percent clear of what is been plotted on the paper and although the standard deviation of our plot seems huge, it is only a difference of ~0.015.
+For Planning, our plot does not start at zero, but it is reaching the optimal value and have the same shape of the one presented by the authors. It is not entirely clear of what is been plotted on the paper and although the standard deviation of our plot seems huge, it is only a difference of ~0.015.
 
 Therefore, we consider our implementation of the paper is correct.
 
