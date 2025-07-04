@@ -153,8 +153,12 @@ from typing import List, Tuple
 import numpy as np
 from tqdm import tqdm
 
+from common.option import get_true_option_reward_model, get_true_option_transition_model
+from common.statistics import rmse
+
 from gridworld.gridworld import Actions
 from stomp.foundation import TemporaryFoundation as Foundation
+
 
 
 class TemporaryModelLearning:
@@ -181,12 +185,26 @@ class TemporaryModelLearning:
         is_primitive_action = option_idx < self.foundation.env.num_actions
         subgoal_idx = option_idx - self.foundation.env.num_actions
 
+        # Get true reward and transition models for statistics
+        TRUE_REWARD_MODEL = get_true_option_reward_model(
+            self.foundation.env,
+            self.foundation,
+            subgoal_idx,
+            gamma=self.foundation.gamma
+        )
+        TRUE_TRANSITION_MODEL = get_true_option_transition_model(
+            self.foundation.env,
+            self.foundation,
+            subgoal_idx,
+            gamma=self.foundation.gamma
+        )
+
         # Initiating env
         done = False
         state = self.foundation.env.reset()
 
-        # Lists to store the model errors
-        reward_model_errors = []
+        # Store model errors
+        reward_model_rmses = []
         transition_model_errors = []
 
         for step in tqdm(range(off_policy_steps)):
@@ -222,8 +240,19 @@ class TemporaryModelLearning:
             )
 
             # Store prediciton errors
-            reward_model_errors.append(...)
-            transition_model_errors.append(...)
+            reward_model_rmses.append(rmse(
+                list(TRUE_REWARD_MODEL.values()),
+                [self.foundation.w_rewards[option_idx] @ \
+                 self.foundation.env.get_one_hot_state( self.foundation.env.state_idx_to_coordinates[s] )
+                 for s in range(self.foundation.env.num_states)]
+            ))
+
+            transition_model_errors.append(np.mean(
+                [rmse(
+                    TRUE_TRANSITION_MODEL[s], self.foundation.W_transitions[option_idx] @ \
+                        self.foundation.env.get_one_hot_state( self.foundation.env.state_idx_to_coordinates[s] )
+                ) for s in TRUE_TRANSITION_MODEL.keys()]
+            ))
 
             # Calculating the importance sampling ratio for off-policy learning
             option_probs = (
@@ -318,4 +347,4 @@ class TemporaryModelLearning:
             state = next_state
             state_features = next_state_features
 
-        return reward_model_errors, transition_model_errors
+        return reward_model_rmses, transition_model_errors

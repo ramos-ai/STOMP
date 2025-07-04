@@ -148,8 +148,9 @@ class TemporaryOptionLearning:
         state_features = self.foundation.env.get_one_hot_state(state)
         initial_state_features = state_features
 
-        initial_state_estimative = []
+        # Store statistics
         # To calculate the RMSE of the states we need the optimal value function
+        initial_state_estimative = []
         if return_rmse:
             from common.rl import value_iteration
             OPTIMAL_V = value_iteration(
