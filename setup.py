@@ -28,5 +28,6 @@ setup(
         "plotly==6.0.1",
         "nbformat==5.10.4",
         "ruff==0.11.8",
+        "numba==0.61.2",
     ],
 )
