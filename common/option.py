@@ -9,8 +9,9 @@ def get_true_option_reward_model(
         # task: Subtask,
         # option: Option,
         foundation: Foundation,
-        subgoal_idx: int,
-        gamma: float =0.99):
+        option_idx: int,
+        gamma: float =0.99,
+        is_primitive_action: bool = False):
     """ Get the true reward model for the option in the environment for a given task. Eq (12) in the paper. """
 
     TRUE_REWARD_MODEL = {s: 0. for s in range(env.num_states)}
@@ -27,8 +28,12 @@ def get_true_option_reward_model(
         while not stop:
             # Sample next state using the option model
                 # a = option.choose_action(env, env.state)
-            probs = foundation.softmax_option_policy(env.current_state, subgoal_idx)
-            a = np.argmax(probs)
+            if is_primitive_action:
+                a = option_idx
+            else:
+                subgoal_idx = option_idx - foundation.env.num_actions
+                probs = foundation.softmax_option_policy(env.current_state, subgoal_idx)
+                a = np.argmax(probs)
             next_state, reward, done = env.step(a)
 
             # Store reward
@@ -36,7 +41,7 @@ def get_true_option_reward_model(
 
             # Check if option should stop
                 # stop = task.B(next_state, option.w)
-            if done:
+            if done or is_primitive_action:
                 stop = True
                 continue
 
@@ -55,8 +60,9 @@ def get_true_option_transition_model(
         # task: Subtask,
         # option: Option,
         foundation: Foundation,
-        subgoal_idx: int,
-        gamma: float =0.99):
+        option_idx: int,
+        gamma: float =0.99,
+        is_primitive_action: bool = False):
     """ Get the true transition model for the option in the environment for a given task. Eq (13) in the paper."""
 
     TRUE_TRANSITION_MODEL = {s: [0. for _ in range(env.num_states)] for s in range(env.num_states)}
@@ -73,8 +79,12 @@ def get_true_option_transition_model(
         while not stop:
             # Sample next state using the option model
                 # a = option.choose_action(env, env.state)
-            probs = foundation.softmax_option_policy(env.current_state, subgoal_idx)
-            a = np.argmax(probs)
+            if is_primitive_action:
+                a = option_idx
+            else:
+                subgoal_idx = option_idx - foundation.env.num_actions
+                probs = foundation.softmax_option_policy(env.current_state, subgoal_idx)
+                a = np.argmax(probs)
             next_state, reward, done = env.step(a)
 
             # Increase t
@@ -82,7 +92,7 @@ def get_true_option_transition_model(
 
             # Check if option should stop
                 # stop = task.B(next_state, option.w)
-            if done:
+            if done or is_primitive_action:
                 stop = True
                 continue
 

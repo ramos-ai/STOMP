@@ -83,8 +83,6 @@ class ModelLearning(STOMPFoundation):
             )
             rho = option_probs[action] / self.behavior_policy_probs[action]
 
-            # Update models weights
-
             # Update reward model
             delta_r = self.td_error(
                 reward,
@@ -160,7 +158,6 @@ from gridworld.gridworld import Actions
 from stomp.foundation import TemporaryFoundation as Foundation
 
 
-
 class TemporaryModelLearning:
     def __init__(
         self,
@@ -189,14 +186,16 @@ class TemporaryModelLearning:
         TRUE_REWARD_MODEL = get_true_option_reward_model(
             self.foundation.env,
             self.foundation,
-            subgoal_idx,
-            gamma=self.foundation.gamma
+            option_idx,
+            gamma=self.foundation.gamma,
+            is_primitive_action=is_primitive_action,
         )
         TRUE_TRANSITION_MODEL = get_true_option_transition_model(
             self.foundation.env,
             self.foundation,
-            subgoal_idx,
-            gamma=self.foundation.gamma
+            option_idx,
+            gamma=self.foundation.gamma,
+            is_primitive_action=is_primitive_action,
         )
 
         # Initiating env
