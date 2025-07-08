@@ -254,11 +254,11 @@ class TemporaryModelLearning:
             ))
 
             # Calculating the importance sampling ratio for off-policy learning
-            option_probs = (
-                np.ones(self.foundation.env.num_actions) / self.foundation.env.num_actions
-                if is_primitive_action
-                else self.foundation.softmax_option_policy(state, subgoal_idx)
-            )
+            if is_primitive_action:
+                option_probs = np.zeros(self.foundation.env.num_actions)
+                option_probs[action] = 1.  # for primitive actions, the probability is 1. the direction of the action
+            else:
+                option_probs = self.foundation.softmax_option_policy(state, subgoal_idx)
             importance_sampling_ratio = (option_probs[action] / self.foundation.behavior_policy_probs[action])
 
             # Handling the stopping value and option probabilities
