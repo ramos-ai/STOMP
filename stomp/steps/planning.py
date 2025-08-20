@@ -52,4 +52,12 @@ class Planning:
             delta = max_backup_value - float(self.foundation.w @ state_features)
             self.foundation.w += self.alpha_step_size * delta * state_features
 
+            # wandb integration
+            if self.foundation.wandb_run is not None:
+                self.foundation.wandb_run.log(
+                    {
+                        "planning_initial_state_estimative": initial_state_planning_estimative[-1],
+                    }
+                )
+
         return initial_state_planning_estimative

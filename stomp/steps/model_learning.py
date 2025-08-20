@@ -144,6 +144,7 @@ class ModelLearning:
                 self.foundation.gamma * self.lambda_ * (1 - should_stop),
             )
 
+            # Learning the Transition model
             for j in range(self.foundation.env.num_states):
                 delta_n = self.foundation.td_error(
                     0,
@@ -164,37 +165,17 @@ class ModelLearning:
                     self.foundation.gamma * self.lambda_ * (1 - int(should_stop)),
                 )
 
-            # Learning the Transition model
-            # In the original paper, the transition model is learned for each state
-            # We introduce a vectorized version of the transition model learning
-            # predicted_state_feature = (
-            #     self.foundation.W_transitions[option_idx] @ state_features
-            # )
-            # predicted_next_state_feature = (
-            #     self.foundation.W_transitions[option_idx] @ next_state_features
-            # )
-            # delta_vec = self.foundation.td_error(
-            #     0,
-            #     next_state_features,
-            #     predicted_state_feature,
-            #     predicted_next_state_feature,
-            #     should_stop,
-            # )
-
-            # (
-            #     self.foundation.W_transitions[option_idx],
-            #     self.foundation.e_transitions[option_idx],
-            # ) = self.foundation.vecUWT(
-            #     self.foundation.W_transitions[option_idx],
-            #     self.foundation.e_transitions[option_idx],
-            #     state_features,
-            #     self.alpha_p * delta_vec,
-            #     importance_sampling_ratio,
-            #     self.foundation.gamma * self.lambda_ * (1 - should_stop),
-            # )
-
             # Moving to the next state
             state = next_state
             state_features = next_state_features
+
+            # wandb integration
+            if self.foundation.wandb_run is not None:
+                self.foundation.wandb_run.log(
+                    {
+                        f"model_learning_{option_idx}_reward_model_rmses": reward_model_rmses[-1],
+                        f"model_learning_{option_idx}_transition_model_errors": transition_model_errors[-1],
+                    }
+                )
 
         return reward_model_rmses, transition_model_errors

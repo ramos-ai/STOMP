@@ -143,6 +143,15 @@ class OptionLearning:
             state = next_state
             state_features = next_state_features
 
+            # wandb integration
+            if self.foundation.wandb_run is not None:
+                self.foundation.wandb_run.log(
+                    {
+                        "option_learning_initial_state_estimative": initial_state_estimative[-1],
+                        "option_learning_rmse_of_state_values": rmse_of_state_values[-1],
+                    }
+                )
+
         if return_rmse:
             return initial_state_estimative, rmse_of_state_values
         else:

@@ -4,6 +4,7 @@ from typing import List
 import numba
 import numpy as np
 from numpy.typing import NDArray
+import wandb
 
 from gridworld.gridworld import Actions, GridWorld, State
 
@@ -77,6 +78,10 @@ class Foundation:
             self.behavior_policy_probs = (
                 np.ones(self.env.num_actions) / self.env.num_actions
             )
+
+        # Setup WandB logging
+        # wandb is set in STOMP class (_setup_wandb)
+        self.wandb_run: wandb.Run | None = None
 
         # For STOMP we don't consider the GOAL state, while for Successor we do
         # Therefore, when we change context from Successor to STOMP we need to reset the environment

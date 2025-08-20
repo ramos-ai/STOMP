@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
 
+from .room_design import stomp_four_room_design, stomp_two_room_design
+
 
 State = Tuple[int, int]  # (x, y) coordinates in the grid
 OneHotVector = NDArray[np.int_]
@@ -55,6 +57,9 @@ class GridWorld:
         # Basic properties
         self.num_states = len(self.state_idx_to_coordinates)
         self.num_actions = len(Actions)
+
+        # Set name
+        self.name = "TwoRooms"
 
         self.current_state: State = self.initial_state
         self.done = False
