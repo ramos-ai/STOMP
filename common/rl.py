@@ -1,6 +1,6 @@
 import numpy as np
 
-from gridworld.gridworld import State, TemporaryGridWorld as GridWorld
+from gridworld.gridworld import GridWorld, State
 
 
 def value_iteration(
@@ -52,7 +52,7 @@ def value_iteration(
 if __name__ == "__main__":
     import argparse
 
-    from gridworld.gridworld import TemporaryGridWorld as GridWorld
+    from gridworld.gridworld import GridWorld
     from gridworld.room_design import stomp_two_room_design as room_design
 
     parser = argparse.ArgumentParser(description="Value Iteration Learning")

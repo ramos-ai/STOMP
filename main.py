@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 from gridworld.gridworld import GridWorld
-from gridworld.room_design import two_room_design as room_design
+from gridworld.room_design import stomp_two_room_design as room_design
 from stomp.framework import STOMP
 
 

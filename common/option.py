@@ -1,7 +1,7 @@
 import numpy as np
 
-from gridworld.gridworld import State, TemporaryGridWorld as GridWorld
-from stomp.foundation import TemporaryFoundation as Foundation
+from gridworld.gridworld import GridWorld
+from stomp.foundation import Foundation
 
 
 def get_true_option_reward_model(
